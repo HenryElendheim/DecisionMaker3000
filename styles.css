@@ -1,0 +1,238 @@
+:root {
+    --bg: #18111f;
+    --surface: #251a33;
+    --surface-hover: #30243f;
+    --border: #3d2f57;
+    --text: #f1ecf8;
+    --muted: #b6a6cf;
+    --accent: #b14de0;
+    --accent-2: #8e2de2;
+    --glow: #2c1746;
+    --radius: 16px;
+    --max-width: 480px;
+    color-scheme: dark;
+}
+
+[data-theme="light"] {
+    --bg: #f6f2fb;
+    --surface: #ffffff;
+    --surface-hover: #f3ecfb;
+    --border: #e2d6f2;
+    --text: #251733;
+    --muted: #6c5c86;
+    --accent: #b14de0;
+    --accent-2: #8e2de2;
+    --glow: #ece0fa;
+    color-scheme: light;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(120% 80% at 50% -10%, var(--glow) 0%, transparent 55%),
+        var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 4rem 1.25rem 3rem;
+}
+
+h1 {
+    font-size: 1.75rem;
+    margin: 0 0 1rem;
+}
+
+.app-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.tagline {
+    color: var(--muted);
+    margin: 0 0 2rem;
+}
+
+.settings-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.15s ease, border-color 0.15s ease, transform 0.25s ease;
+}
+
+.settings-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    transform: rotate(45deg);
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.game-card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.15rem;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    background: var(--surface-hover);
+}
+
+.game-card:active {
+    transform: translateY(0);
+}
+
+.game-name {
+    flex: 1;
+}
+
+.game-chevron {
+    color: var(--muted);
+    font-size: 1.4rem;
+}
+
+.back {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.4rem 0;
+    margin-bottom: 0.5rem;
+}
+
+.back:hover {
+    color: var(--text);
+}
+
+.game {
+    text-align: center;
+}
+
+.coin {
+    width: 180px;
+    height: 180px;
+    margin: 2rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.coin img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.coin-placeholder {
+    font-size: 4rem;
+    color: var(--muted);
+}
+
+.btn {
+    font: inherit;
+    font-size: 1.05rem;
+    color: #ffffff;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    border: none;
+    border-radius: 999px;
+    padding: 0.85rem 2.25rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+}
+
+.settings-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin: 1.5rem 0 0.75rem;
+}
+
+.theme-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: var(--max-width);
+}
+
+.theme-btn {
+    font: inherit;
+    font-size: 1.05rem;
+    text-align: left;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.15rem;
+    cursor: pointer;
+    transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.theme-btn:hover {
+    border-color: var(--accent);
+    background: var(--surface-hover);
+}
+
+.theme-btn.active {
+    border: 2px solid var(--accent);
+}
+
+.placeholder {
+    padding-top: 2rem;
+}
