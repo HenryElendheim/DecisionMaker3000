@@ -44,7 +44,8 @@ const model = {
         ]
     },
     dice: {
-        value: null,
+        count: 1,
+        values: [],
         rolling: false,
         sides: 6
     },

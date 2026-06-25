@@ -61,16 +61,15 @@ const view = {
             html += `<button class="back" data-nav="home">‹ Back</button>`;
             html += `<div class="game">`;
             html += `<h1>Dice Roll</h1>`;
-            html += `<div class="die${dice.rolling ? " rolling" : ""}" id="die">`;
-            html += view.dieFace(dice.value);
+            html += `<div class="dice-count">`;
+            html += `<label>Number of dice <input type="number" id="dice-count" min="1" max="10" value="${dice.count}"${dice.rolling ? " disabled" : ""}></label>`;
+            html += `</div>`;
+            html += `<div class="dice" id="dice">`;
+            html += view.diceMarkup(model);
             html += `</div>`;
             if (dice.rolling)
             {
                 html += `<button class="btn" data-action="roll" disabled>Rolling…</button>`;
-            }
-            else if (dice.value)
-            {
-                html += `<button class="btn" data-action="roll">Roll again</button>`;
             }
             else
             {
@@ -298,12 +297,34 @@ const view = {
         }
         return html;
     },
-    setDie(value)
+    diceMarkup(model)
     {
-        const die = document.getElementById("die");
-        if (die)
+        const dice = model.dice;
+        let html = "";
+        for (let i = 0; i < dice.count; i++)
         {
-            die.innerHTML = view.dieFace(value);
+            const value = (dice.values && dice.values[i]) ? dice.values[i] : null;
+            html += `<div class="die${dice.rolling ? " rolling" : ""}" id="die-${i}">${view.dieFace(value)}</div>`;
+        }
+        return html;
+    },
+    setDiceArea(model)
+    {
+        const container = document.getElementById("dice");
+        if (container)
+        {
+            container.innerHTML = view.diceMarkup(model);
+        }
+    },
+    setDiceValues(values)
+    {
+        for (let i = 0; i < values.length; i++)
+        {
+            const die = document.getElementById("die-" + i);
+            if (die)
+            {
+                die.innerHTML = view.dieFace(values[i]);
+            }
         }
     },
     wheelGradient(options)

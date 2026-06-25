@@ -9,7 +9,7 @@ const controller = {
         }
         else if (viewName === "dice")
         {
-            model.dice.value = null;
+            model.dice.values = [];
         }
         else if (viewName === "magic8")
         {
@@ -102,7 +102,11 @@ const controller = {
         }
 
         dice.rolling = true;
-        dice.value = Math.floor(Math.random() * dice.sides) + 1;
+        dice.values = [];
+        for (let d = 0; d < dice.count; d++)
+        {
+            dice.values.push(Math.floor(Math.random() * dice.sides) + 1);
+        }
         view.render(model);
 
         let ticks = 0;
@@ -111,17 +115,38 @@ const controller = {
             ticks++;
             if (ticks < 10)
             {
-                dice.value = Math.floor(Math.random() * dice.sides) + 1;
-                view.setDie(dice.value);
+                for (let d = 0; d < dice.count; d++)
+                {
+                    dice.values[d] = Math.floor(Math.random() * dice.sides) + 1;
+                }
+                view.setDiceValues(dice.values);
             }
             else
             {
                 clearInterval(timer);
-                dice.value = Math.floor(Math.random() * dice.sides) + 1;
+                for (let d = 0; d < dice.count; d++)
+                {
+                    dice.values[d] = Math.floor(Math.random() * dice.sides) + 1;
+                }
                 dice.rolling = false;
                 view.render(model);
             }
         }, 60);
+    },
+    setDiceCount(raw)
+    {
+        let count = parseInt(raw, 10);
+        if (isNaN(count) || count < 1)
+        {
+            count = 1;
+        }
+        if (count > 10)
+        {
+            count = 10;
+        }
+        model.dice.count = count;
+        model.dice.values = [];
+        view.setDiceArea(model);
     },
     ask()
     {
@@ -283,10 +308,76 @@ const controller = {
             img.src = src;
         }
     },
+    save()
+    {
+        try
+        {
+            const data = {
+                theme: model.theme,
+                coinMode: model.coin.mode,
+                diceCount: model.dice.count,
+                numberMin: model.number.min,
+                numberMax: model.number.max,
+                wheelOptions: model.wheel.options
+            };
+            localStorage.setItem("decisionmaker", JSON.stringify(data));
+        }
+        catch (e)
+        {
+        }
+    },
+    load()
+    {
+        try
+        {
+            const raw = localStorage.getItem("decisionmaker");
+            if (!raw)
+            {
+                return;
+            }
+            const data = JSON.parse(raw);
+            if (data.theme)
+            {
+                model.theme = data.theme;
+            }
+            if (data.coinMode)
+            {
+                model.coin.mode = data.coinMode;
+            }
+            if (typeof data.diceCount === "number")
+            {
+                model.dice.count = data.diceCount;
+            }
+            if (typeof data.numberMin === "number")
+            {
+                model.number.min = data.numberMin;
+            }
+            if (typeof data.numberMax === "number")
+            {
+                model.number.max = data.numberMax;
+            }
+            if (Array.isArray(data.wheelOptions) && data.wheelOptions.length >= 2)
+            {
+                model.wheel.options = data.wheelOptions;
+            }
+        }
+        catch (e)
+        {
+        }
+    },
     init()
     {
+        controller.load();
         controller.preload();
         document.documentElement.dataset.theme = model.theme;
+        window.addEventListener("beforeunload", controller.save);
+        document.addEventListener("visibilitychange", () =>
+        {
+            if (document.visibilityState === "hidden")
+            {
+                controller.save();
+            }
+        });
         model.app.addEventListener("click", (e) =>
         {
             const nav = e.target.closest("[data-nav]");
@@ -353,11 +444,24 @@ const controller = {
 
         model.app.addEventListener("input", (e) =>
         {
-            const el = e.target.closest("[data-edit]");
-            if (el)
+            const editEl = e.target.closest("[data-edit]");
+            if (editEl)
             {
-                const index = parseInt(el.dataset.index, 10);
-                model.wheel.options[index][el.dataset.edit] = el.value;
+                const index = parseInt(editEl.dataset.index, 10);
+                model.wheel.options[index][editEl.dataset.edit] = editEl.value;
+                return;
+            }
+            if (e.target.id === "dice-count")
+            {
+                controller.setDiceCount(e.target.value);
+            }
+        });
+
+        model.app.addEventListener("change", (e) =>
+        {
+            if (e.target.id === "dice-count")
+            {
+                e.target.value = model.dice.count;
             }
         });
         view.render(model);
