@@ -50,6 +50,157 @@ const view = {
             html += `</div>`;
             return html;
         },
+        dice(model)
+        {
+            const dice = model.dice;
+            let html = "";
+            html += `<button class="back" data-nav="home">‹ Back</button>`;
+            html += `<div class="game">`;
+            html += `<h1>Dice Roll</h1>`;
+            html += `<div class="die${dice.rolling ? " rolling" : ""}" id="die">`;
+            html += view.dieFace(dice.value);
+            html += `</div>`;
+            if (dice.rolling)
+            {
+                html += `<button class="btn" data-action="roll" disabled>Rolling…</button>`;
+            }
+            else if (dice.value)
+            {
+                html += `<button class="btn" data-action="roll">Roll again</button>`;
+            }
+            else
+            {
+                html += `<button class="btn" data-action="roll">Roll</button>`;
+            }
+            html += `</div>`;
+            return html;
+        },
+        magic8(model)
+        {
+            const magic8 = model.magic8;
+            let html = "";
+            html += `<button class="back" data-nav="home">‹ Back</button>`;
+            html += `<div class="game">`;
+            html += `<h1>Magic 8-Ball</h1>`;
+            html += `<div class="ball${magic8.shaking ? " shaking" : ""}">`;
+            html += `<div class="ball-window">`;
+            if (magic8.shaking)
+            {
+                html += `…`;
+            }
+            else if (magic8.answer)
+            {
+                html += magic8.answer;
+            }
+            else
+            {
+                html += `<span class="ball-8">8</span>`;
+            }
+            html += `</div>`;
+            html += `</div>`;
+            if (magic8.shaking)
+            {
+                html += `<button class="btn" data-action="ask" disabled>Shaking…</button>`;
+            }
+            else if (magic8.answer)
+            {
+                html += `<button class="btn" data-action="ask">Ask again</button>`;
+            }
+            else
+            {
+                html += `<button class="btn" data-action="ask">Ask</button>`;
+            }
+            html += `</div>`;
+            return html;
+        },
+        wheel(model)
+        {
+            const wheel = model.wheel;
+            let html = "";
+            html += `<button class="back" data-nav="home">‹ Back</button>`;
+            html += `<div class="game">`;
+            html += `<h1>Decision Wheel</h1>`;
+            if (wheel.editing)
+            {
+                html += `<div class="wheel-editor">`;
+                for (let i = 0; i < wheel.options.length; i++)
+                {
+                    const opt = wheel.options[i];
+                    const removeDisabled = wheel.options.length <= 2 ? " disabled" : "";
+                    html += `<div class="edit-row">`;
+                    html += `<input type="color" class="edit-color" data-edit="color" data-index="${i}" value="${opt.color}">`;
+                    html += `<input type="text" class="edit-label" data-edit="label" data-index="${i}" value="${view.escape(opt.label)}" maxlength="14">`;
+                    html += `<button class="edit-remove" data-action="removeOption" data-index="${i}" aria-label="Remove option"${removeDisabled}>✕</button>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+                html += `<div class="wheel-editor-actions">`;
+                if (wheel.options.length < 8)
+                {
+                    html += `<button class="btn-secondary" data-action="addOption">+ Add option</button>`;
+                }
+                html += `<button class="btn-secondary" data-action="resetWheel">Reset to default</button>`;
+                html += `<button class="btn" data-action="doneEditing">Done</button>`;
+                html += `</div>`;
+            }
+            else
+            {
+                const options = wheel.options;
+                const seg = 360 / options.length;
+                html += `<div class="wheel-wrap">`;
+                html += `<div class="wheel-pointer"></div>`;
+                html += `<div class="wheel" id="wheel" style="transform: rotate(${wheel.rotation}deg); background: ${view.wheelGradient(options)}">`;
+                for (let i = 0; i < options.length; i++)
+                {
+                    const angle = i * seg + seg / 2;
+                    html += `<div class="wheel-label" style="transform: rotate(${angle}deg)"><span>${view.escape(options[i].label)}</span></div>`;
+                }
+                html += `</div>`;
+                html += `</div>`;
+                if (!wheel.spinning && wheel.result)
+                {
+                    html += `<p class="wheel-result">${view.escape(wheel.result)}</p>`;
+                }
+                html += `<div class="wheel-controls">`;
+                if (wheel.spinning)
+                {
+                    html += `<button class="btn" data-action="spin" disabled>Spinning…</button>`;
+                }
+                else
+                {
+                    html += `<button class="btn" data-action="spin">${wheel.result ? "Spin again" : "Spin"}</button>`;
+                }
+                html += `<button class="btn-secondary" data-action="editWheel"${wheel.spinning ? " disabled" : ""}>Edit</button>`;
+                html += `</div>`;
+            }
+            html += `</div>`;
+            return html;
+        },
+        number(model)
+        {
+            const number = model.number;
+            let html = "";
+            html += `<button class="back" data-nav="home">‹ Back</button>`;
+            html += `<div class="game">`;
+            html += `<h1>Pick a Number</h1>`;
+            html += `<div class="number-range">`;
+            html += `<label>Min <input type="number" id="num-min" value="${number.min}"></label>`;
+            html += `<label>Max <input type="number" id="num-max" value="${number.max}"></label>`;
+            html += `</div>`;
+            html += `<div class="number-display" id="number-display">`;
+            html += (number.value !== null ? number.value : "?");
+            html += `</div>`;
+            if (number.picking)
+            {
+                html += `<button class="btn" data-action="pick" disabled>Picking…</button>`;
+            }
+            else
+            {
+                html += `<button class="btn" data-action="pick">${number.value !== null ? "Pick again" : "Pick"}</button>`;
+            }
+            html += `</div>`;
+            return html;
+        },
         settings(model)
         {
             let html = "";
@@ -116,6 +267,73 @@ const view = {
         if (img)
         {
             img.src = src;
+        }
+    },
+    dieFace(value)
+    {
+        const layouts = {
+            1: [5],
+            2: [1, 9],
+            3: [1, 5, 9],
+            4: [1, 3, 7, 9],
+            5: [1, 3, 5, 7, 9],
+            6: [1, 3, 4, 6, 7, 9]
+        };
+        const pips = layouts[value] || [];
+        let html = "";
+        for (let cell = 1; cell <= 9; cell++)
+        {
+            if (pips.includes(cell))
+            {
+                html += `<span class="cell"><span class="pip"></span></span>`;
+            }
+            else
+            {
+                html += `<span class="cell"></span>`;
+            }
+        }
+        return html;
+    },
+    setDie(value)
+    {
+        const die = document.getElementById("die");
+        if (die)
+        {
+            die.innerHTML = view.dieFace(value);
+        }
+    },
+    wheelGradient(options)
+    {
+        const seg = 360 / options.length;
+        const stops = [];
+        for (let i = 0; i < options.length; i++)
+        {
+            stops.push(`${options[i].color} ${i * seg}deg ${(i + 1) * seg}deg`);
+        }
+        return `conic-gradient(${stops.join(", ")})`;
+    },
+    escape(str)
+    {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    },
+    setWheelRotation(deg)
+    {
+        const wheel = document.getElementById("wheel");
+        if (wheel)
+        {
+            wheel.style.transform = `rotate(${deg}deg)`;
+        }
+    },
+    setNumber(value)
+    {
+        const el = document.getElementById("number-display");
+        if (el)
+        {
+            el.textContent = value;
         }
     }
 };
