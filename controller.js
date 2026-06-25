@@ -40,6 +40,14 @@ const controller = {
         model.coin.frame = null;
         view.render(model);
     },
+    toggleCoinMode()
+    {
+        const coin = model.coin;
+        coin.mode = (coin.mode === "headstails") ? "yesno" : "headstails";
+        coin.result = null;
+        coin.frame = null;
+        view.render(model);
+    },
     flip()
     {
         const coin = model.coin;
@@ -300,6 +308,10 @@ const controller = {
             else if (action && action.dataset.action === "setCoinMode")
             {
                 controller.setCoinMode(action.dataset.mode);
+            }
+            else if (action && action.dataset.action === "toggleCoinMode")
+            {
+                controller.toggleCoinMode();
             }
             else if (action && action.dataset.action === "roll")
             {

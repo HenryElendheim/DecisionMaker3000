@@ -35,6 +35,7 @@ const view = {
                 html += `<img id="coin-img" src="images/flipEmpty.png" alt="?">`;
             }
             html += `</div>`;
+            html += `<div class="coin-controls">`;
             if (coin.flipping)
             {
                 html += `<button class="btn" data-action="flip" disabled>Flipping…</button>`;
@@ -47,6 +48,9 @@ const view = {
             {
                 html += `<button class="btn" data-action="flip">Flip</button>`;
             }
+            const headsTailsOn = coin.mode === "headstails";
+            html += `<button class="btn-secondary${headsTailsOn ? " toggle-on" : ""}" data-action="toggleCoinMode"${coin.flipping ? " disabled" : ""} aria-pressed="${headsTailsOn}">Heads / Tails</button>`;
+            html += `</div>`;
             html += `</div>`;
             return html;
         },
