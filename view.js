@@ -204,6 +204,31 @@ const view = {
             html += `</div>`;
             return html;
         },
+        time(model)
+        {
+            const time = model.time;
+            let html = "";
+            html += `<button class="back" data-nav="home">‹ Back</button>`;
+            html += `<div class="game">`;
+            html += `<h1>Pick a Time</h1>`;
+            html += `<div class="time-range">`;
+            html += `<label>From <input type="time" id="time-start" value="${time.start}"></label>`;
+            html += `<label>To <input type="time" id="time-end" value="${time.end}"></label>`;
+            html += `</div>`;
+            html += `<div class="time-display" id="time-result">`;
+            html += (time.result !== null ? time.result : "--:--");
+            html += `</div>`;
+            if (time.picking)
+            {
+                html += `<button class="btn" data-action="pickTime" disabled>Picking…</button>`;
+            }
+            else
+            {
+                html += `<button class="btn" data-action="pickTime">${time.result !== null ? "Pick again" : "Pick a time"}</button>`;
+            }
+            html += `</div>`;
+            return html;
+        },
         settings(model)
         {
             let html = "";
@@ -356,6 +381,14 @@ const view = {
     setNumber(value)
     {
         const el = document.getElementById("number-display");
+        if (el)
+        {
+            el.textContent = value;
+        }
+    },
+    setTime(value)
+    {
+        const el = document.getElementById("time-result");
         if (el)
         {
             el.textContent = value;

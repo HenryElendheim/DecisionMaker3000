@@ -11,7 +11,8 @@ const model = {
         { id: "magic8", name: "Magic 8-Ball" },
         { id: "dice", name: "Dice Roll" },
         { id: "wheel", name: "Decision Wheel" },
-        { id: "number", name: "Pick a Number" }
+        { id: "number", name: "Pick a Number" },
+        { id: "time", name: "Pick a Time" }
     ],
     coin: {
         result: null,
@@ -101,6 +102,12 @@ const model = {
         min: 1,
         max: 100,
         value: null,
+        picking: false
+    },
+    time: {
+        start: "09:00",
+        end: "17:00",
+        result: null,
         picking: false
     }
 };

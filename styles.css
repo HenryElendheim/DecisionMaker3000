@@ -444,6 +444,39 @@ h1 {
     color: transparent;
 }
 
+.time-range {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.time-range label {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.time-range input {
+    margin-left: 6px;
+    padding: 0.5rem;
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.time-display {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 1.5rem 0;
+    min-height: 1.2em;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
 .wheel-controls {
     display: flex;
     justify-content: center;

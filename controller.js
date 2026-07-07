@@ -24,6 +24,10 @@ const controller = {
         {
             model.number.value = null;
         }
+        else if (viewName === "time")
+        {
+            model.time.result = null;
+        }
         model.currentView = viewName;
         view.render(model);
     },
@@ -294,6 +298,67 @@ const controller = {
             }
         }, 50);
     },
+    pickTime()
+    {
+        const time = model.time;
+        if (time.picking)
+        {
+            return;
+        }
+
+        const startInput = document.getElementById("time-start");
+        const endInput = document.getElementById("time-end");
+        if (startInput && startInput.value)
+        {
+            time.start = startInput.value;
+        }
+        if (endInput && endInput.value)
+        {
+            time.end = endInput.value;
+        }
+
+        const toMinutes = (t) =>
+        {
+            const parts = t.split(":");
+            return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+        };
+        const toClock = (mins) =>
+        {
+            const h = Math.floor(mins / 60);
+            const m = mins % 60;
+            return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+        };
+
+        let startMin = toMinutes(time.start);
+        let endMin = toMinutes(time.end);
+        if (startMin > endMin)
+        {
+            const temp = startMin;
+            startMin = endMin;
+            endMin = temp;
+        }
+
+        time.picking = true;
+        view.render(model);
+
+        let ticks = 0;
+        const timer = setInterval(() =>
+        {
+            ticks++;
+            const rand = startMin + Math.floor(Math.random() * (endMin - startMin + 1));
+            if (ticks < 12)
+            {
+                view.setTime(toClock(rand));
+            }
+            else
+            {
+                clearInterval(timer);
+                time.result = toClock(startMin + Math.floor(Math.random() * (endMin - startMin + 1)));
+                time.picking = false;
+                view.render(model);
+            }
+        }, 50);
+    },
     preload()
     {
         const coin = model.coin;
@@ -318,7 +383,9 @@ const controller = {
                 diceCount: model.dice.count,
                 numberMin: model.number.min,
                 numberMax: model.number.max,
-                wheelOptions: model.wheel.options
+                wheelOptions: model.wheel.options,
+                timeStart: model.time.start,
+                timeEnd: model.time.end
             };
             localStorage.setItem("decisionmaker", JSON.stringify(data));
         }
@@ -359,6 +426,14 @@ const controller = {
             if (Array.isArray(data.wheelOptions) && data.wheelOptions.length >= 2)
             {
                 model.wheel.options = data.wheelOptions;
+            }
+            if (typeof data.timeStart === "string")
+            {
+                model.time.start = data.timeStart;
+            }
+            if (typeof data.timeEnd === "string")
+            {
+                model.time.end = data.timeEnd;
             }
         }
         catch (e)
@@ -419,6 +494,10 @@ const controller = {
             else if (action && action.dataset.action === "pick")
             {
                 controller.pick();
+            }
+            else if (action && action.dataset.action === "pickTime")
+            {
+                controller.pickTime();
             }
             else if (action && action.dataset.action === "editWheel")
             {
