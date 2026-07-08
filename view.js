@@ -235,13 +235,66 @@ const view = {
                 html += `<button class="btn" data-action="pickTime">${time.result !== null ? "Pick again" : "Pick a time"}</button>`;
             }
             html += `<label class="ampm-check"><input type="checkbox" id="time-ampm"${time.hour12 ? " checked" : ""}> AM / PM</label>`;
+            html += `<label class="ampm-check"><input type="checkbox" id="time-round"${time.round ? " checked" : ""}> Round to 00 / 15 / 30 / 45</label>`;
+            html += `</div>`;
+            return html;
+        },
+        color(model)
+        {
+            const color = model.color;
+            let html = "";
+            html += `<button class="back" data-nav="home">‹ Back</button>`;
+            html += `<div class="game">`;
+            html += `<h1>Pick a Color</h1>`;
+            if (color.editing)
+            {
+                html += `<div class="color-grid editing">`;
+                for (let i = 0; i < color.options.length; i++)
+                {
+                    const removeDisabled = color.options.length <= 2 ? " disabled" : "";
+                    html += `<div class="color-cell-edit">`;
+                    html += `<label class="color-swatch" style="background:${view.escape(color.options[i])}">`;
+                    html += `<input type="color" class="color-input" data-index="${i}" value="${view.escape(color.options[i])}">`;
+                    html += `</label>`;
+                    html += `<button class="color-remove" data-action="removeColor" data-index="${i}" aria-label="Remove color"${removeDisabled}>✕</button>`;
+                    html += `</div>`;
+                }
+                html += `<button class="color-add" data-action="addColor" aria-label="Add color">+</button>`;
+                html += `</div>`;
+                html += `<div class="color-editor-actions">`;
+                html += `<button class="btn-secondary" data-action="resetColors">Reset to default</button>`;
+                html += `<button class="btn" data-action="doneEditingColors">Done</button>`;
+                html += `</div>`;
+            }
+            else
+            {
+                html += `<div class="color-grid" id="color-grid">`;
+                html += view.colorGridMarkup(model);
+                html += `</div>`;
+                html += `<div class="color-result">`;
+                const swatch = color.result ? color.result : "transparent";
+                html += `<div class="color-result-swatch" style="background:${view.escape(swatch)}"></div>`;
+                html += `<div class="color-result-hex">${color.result ? view.escape(color.result.toUpperCase()) : "--------"}</div>`;
+                html += `</div>`;
+                html += `<div class="color-controls">`;
+                if (color.picking)
+                {
+                    html += `<button class="btn" data-action="pickColor" disabled>Picking…</button>`;
+                }
+                else
+                {
+                    html += `<button class="btn" data-action="pickColor">${color.result ? "Pick again" : "Pick a color"}</button>`;
+                }
+                html += `<button class="btn-secondary" data-action="editColors"${color.picking ? " disabled" : ""}>Edit colors</button>`;
+                html += `</div>`;
+            }
             html += `</div>`;
             return html;
         },
         settings(model)
         {
             let html = "";
-            html += `<button class="back" data-nav="home">‹ Back</button>`;
+            html += `<button class="back" data-action="closeSettings">‹ Back</button>`;
             html += `<h1>Settings</h1>`;
             html += `<h2 class="settings-label">Theme</h2>`;
             html += `<div class="theme-options">`;
@@ -286,7 +339,7 @@ const view = {
         let html = "";
         if (model.currentView !== "settings")
         {
-            html += `<button class="settings-btn" data-nav="settings" aria-label="Settings">`;
+            html += `<button class="settings-btn" data-action="openSettings" aria-label="Settings">`;
             html += `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
             html += `</button>`;
         }
@@ -438,5 +491,24 @@ const view = {
         html += `</div>`;
         html += `</div>`;
         return html;
+    },
+    colorGridMarkup(model)
+    {
+        const color = model.color;
+        let html = "";
+        for (let i = 0; i < color.options.length; i++)
+        {
+            const lit = color.index === i ? " lit" : "";
+            html += `<div class="color-square${lit}" id="color-square-${i}" style="background:${view.escape(color.options[i])}"></div>`;
+        }
+        return html;
+    },
+    setColorHighlight(index)
+    {
+        const squares = document.querySelectorAll(".color-square");
+        squares.forEach((sq, i) =>
+        {
+            sq.classList.toggle("lit", i === index);
+        });
     }
 };

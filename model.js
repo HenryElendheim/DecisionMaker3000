@@ -1,6 +1,7 @@
 const model = {
     app: document.getElementById("app"),
     currentView: "home",
+    returnView: "home",
     theme: "dark",
     themes: [
         { id: "dark", name: "Dark" },
@@ -12,7 +13,8 @@ const model = {
         { id: "dice", name: "Dice Roll" },
         { id: "wheel", name: "Decision Wheel" },
         { id: "number", name: "Pick a Number" },
-        { id: "time", name: "Pick a Time" }
+        { id: "time", name: "Pick a Time" },
+        { id: "color", name: "Pick a Color" }
     ],
     coin: {
         result: null,
@@ -109,6 +111,23 @@ const model = {
         end: "17:00",
         result: null,
         picking: false,
-        hour12: false
+        hour12: false,
+        round: false
+    },
+    color: {
+        result: null,
+        index: null,
+        picking: false,
+        editing: false,
+        options: [
+            "#e74c3c", "#e67e22", "#f1c40f", "#2ecc71",
+            "#1abc9c", "#3498db", "#6c5ce7", "#9b59b6",
+            "#e84393", "#fd79a8", "#00b894", "#fdcb6e"
+        ],
+        defaults: [
+            "#e74c3c", "#e67e22", "#f1c40f", "#2ecc71",
+            "#1abc9c", "#3498db", "#6c5ce7", "#9b59b6",
+            "#e84393", "#fd79a8", "#00b894", "#fdcb6e"
+        ]
     }
 };

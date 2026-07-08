@@ -28,7 +28,24 @@ const controller = {
         {
             model.time.result = null;
         }
+        else if (viewName === "color")
+        {
+            model.color.result = null;
+            model.color.index = null;
+            model.color.editing = false;
+        }
         model.currentView = viewName;
+        view.render(model);
+    },
+    openSettings()
+    {
+        model.returnView = model.currentView;
+        model.currentView = "settings";
+        view.render(model);
+    },
+    closeSettings()
+    {
+        model.currentView = model.returnView;
         view.render(model);
     },
     setTheme(themeId)
@@ -60,6 +77,11 @@ const controller = {
     toggleTimeFormat()
     {
         model.time.hour12 = !model.time.hour12;
+        view.render(model);
+    },
+    toggleTimeRound()
+    {
+        model.time.round = !model.time.round;
         view.render(model);
     },
     readTimeField(target)
@@ -435,6 +457,24 @@ const controller = {
             endMin = temp;
         }
 
+        const pickMinute = () =>
+        {
+            if (time.round)
+            {
+                const quarters = [];
+                const first = Math.ceil(startMin / 15) * 15;
+                for (let q = first; q <= endMin; q += 15)
+                {
+                    quarters.push(q);
+                }
+                if (quarters.length > 0)
+                {
+                    return quarters[Math.floor(Math.random() * quarters.length)];
+                }
+            }
+            return startMin + Math.floor(Math.random() * (endMin - startMin + 1));
+        };
+
         time.picking = true;
         view.render(model);
 
@@ -442,19 +482,99 @@ const controller = {
         const timer = setInterval(() =>
         {
             ticks++;
-            const rand = startMin + Math.floor(Math.random() * (endMin - startMin + 1));
             if (ticks < 12)
             {
-                view.setTime(toClock(rand));
+                view.setTime(toClock(pickMinute()));
             }
             else
             {
                 clearInterval(timer);
-                time.result = toClock(startMin + Math.floor(Math.random() * (endMin - startMin + 1)));
+                time.result = toClock(pickMinute());
                 time.picking = false;
                 view.render(model);
             }
         }, 50);
+    },
+    pickColor()
+    {
+        const color = model.color;
+        if (color.picking)
+        {
+            return;
+        }
+        const n = color.options.length;
+        if (n === 0)
+        {
+            return;
+        }
+
+        const target = Math.floor(Math.random() * n);
+        color.picking = true;
+        color.result = null;
+        color.index = null;
+        view.render(model);
+
+        const total = n * 2 + target;
+        let i = 0;
+        const step = () =>
+        {
+            color.index = i % n;
+            view.setColorHighlight(color.index);
+            i++;
+            if (i > total)
+            {
+                color.index = target;
+                color.result = color.options[target];
+                color.picking = false;
+                view.render(model);
+                return;
+            }
+            const remaining = total - i;
+            let delay = 40;
+            if (remaining < 10)
+            {
+                delay = 40 + (10 - remaining) * 18;
+            }
+            setTimeout(step, delay);
+        };
+        step();
+    },
+    editColors()
+    {
+        model.color.editing = true;
+        model.color.result = null;
+        model.color.index = null;
+        view.render(model);
+    },
+    doneEditingColors()
+    {
+        model.color.editing = false;
+        view.render(model);
+    },
+    addColor()
+    {
+        const color = model.color;
+        const palette = color.defaults;
+        color.options.push(palette[color.options.length % palette.length]);
+        view.render(model);
+    },
+    removeColor(index)
+    {
+        const color = model.color;
+        if (color.options.length <= 2)
+        {
+            return;
+        }
+        color.options.splice(index, 1);
+        view.render(model);
+    },
+    resetColors()
+    {
+        const color = model.color;
+        color.options = color.defaults.slice();
+        color.result = null;
+        color.index = null;
+        view.render(model);
     },
     preload()
     {
@@ -483,7 +603,9 @@ const controller = {
                 wheelOptions: model.wheel.options,
                 timeStart: model.time.start,
                 timeEnd: model.time.end,
-                timeHour12: model.time.hour12
+                timeHour12: model.time.hour12,
+                timeRound: model.time.round,
+                colorOptions: model.color.options
             };
             localStorage.setItem("decisionmaker", JSON.stringify(data));
         }
@@ -536,6 +658,14 @@ const controller = {
             if (typeof data.timeHour12 === "boolean")
             {
                 model.time.hour12 = data.timeHour12;
+            }
+            if (typeof data.timeRound === "boolean")
+            {
+                model.time.round = data.timeRound;
+            }
+            if (Array.isArray(data.colorOptions) && data.colorOptions.length >= 2)
+            {
+                model.color.options = data.colorOptions;
             }
         }
         catch (e)
@@ -629,6 +759,38 @@ const controller = {
             {
                 controller.resetWheel();
             }
+            else if (action && action.dataset.action === "openSettings")
+            {
+                controller.openSettings();
+            }
+            else if (action && action.dataset.action === "closeSettings")
+            {
+                controller.closeSettings();
+            }
+            else if (action && action.dataset.action === "pickColor")
+            {
+                controller.pickColor();
+            }
+            else if (action && action.dataset.action === "editColors")
+            {
+                controller.editColors();
+            }
+            else if (action && action.dataset.action === "doneEditingColors")
+            {
+                controller.doneEditingColors();
+            }
+            else if (action && action.dataset.action === "addColor")
+            {
+                controller.addColor();
+            }
+            else if (action && action.dataset.action === "removeColor")
+            {
+                controller.removeColor(parseInt(action.dataset.index, 10));
+            }
+            else if (action && action.dataset.action === "resetColors")
+            {
+                controller.resetColors();
+            }
         });
 
         model.app.addEventListener("input", (e) =>
@@ -638,6 +800,18 @@ const controller = {
             {
                 const index = parseInt(editEl.dataset.index, 10);
                 model.wheel.options[index][editEl.dataset.edit] = editEl.value;
+                return;
+            }
+            const colorInput = e.target.closest(".color-input");
+            if (colorInput)
+            {
+                const index = parseInt(colorInput.dataset.index, 10);
+                model.color.options[index] = colorInput.value;
+                const swatch = colorInput.closest(".color-swatch");
+                if (swatch)
+                {
+                    swatch.style.background = colorInput.value;
+                }
                 return;
             }
             if (e.target.id === "dice-count")
@@ -659,6 +833,10 @@ const controller = {
             else if (e.target.id === "time-ampm")
             {
                 controller.toggleTimeFormat();
+            }
+            else if (e.target.id === "time-round")
+            {
+                controller.toggleTimeRound();
             }
         });
         view.render(model);
