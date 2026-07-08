@@ -268,13 +268,15 @@ const view = {
             }
             else
             {
-                html += `<div class="color-grid" id="color-grid">`;
+                const gridResult = color.result && !color.picking ? " has-result" : "";
+                html += `<div class="color-grid${gridResult}" id="color-grid">`;
                 html += view.colorGridMarkup(model);
                 html += `</div>`;
                 html += `<div class="color-result">`;
                 const swatch = color.result ? color.result : "transparent";
-                html += `<div class="color-result-swatch" style="background:${view.escape(swatch)}"></div>`;
-                html += `<div class="color-result-hex">${color.result ? view.escape(color.result.toUpperCase()) : "--------"}</div>`;
+                const swatchPop = color.result && !color.picking ? " pop" : "";
+                html += `<div class="color-result-swatch${swatchPop}" style="background:${view.escape(swatch)}"></div>`;
+                html += `<div class="color-result-hex${swatchPop}">${color.result ? view.escape(color.result.toUpperCase()) : "--------"}</div>`;
                 html += `</div>`;
                 html += `<div class="color-controls">`;
                 if (color.picking)
@@ -495,11 +497,16 @@ const view = {
     colorGridMarkup(model)
     {
         const color = model.color;
+        const landed = !!color.result && !color.picking;
         let html = "";
         for (let i = 0; i < color.options.length; i++)
         {
-            const lit = color.index === i ? " lit" : "";
-            html += `<div class="color-square${lit}" id="color-square-${i}" style="background:${view.escape(color.options[i])}"></div>`;
+            let state = "";
+            if (color.index === i)
+            {
+                state = landed ? " landed" : " lit";
+            }
+            html += `<div class="color-square${state}" id="color-square-${i}" style="background:${view.escape(color.options[i])}"></div>`;
         }
         return html;
     },
