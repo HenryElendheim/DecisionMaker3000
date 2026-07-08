@@ -119,6 +119,7 @@ const model = {
         index: null,
         picking: false,
         editing: false,
+        max: 50,
         options: [
             "#e74c3c", "#e67e22", "#f1c40f", "#2ecc71",
             "#1abc9c", "#3498db", "#6c5ce7", "#9b59b6",

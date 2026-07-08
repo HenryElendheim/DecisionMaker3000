@@ -554,9 +554,19 @@ const controller = {
     addColor()
     {
         const color = model.color;
+        if (color.options.length >= (color.max || 50))
+        {
+            return;
+        }
         const palette = color.defaults;
         color.options.push(palette[color.options.length % palette.length]);
         view.render(model);
+        const cells = document.querySelectorAll(".color-cell-edit");
+        const added = cells[cells.length - 1];
+        if (added)
+        {
+            added.classList.add("adding");
+        }
     },
     removeColor(index)
     {
@@ -565,8 +575,40 @@ const controller = {
         {
             return;
         }
-        color.options.splice(index, 1);
-        view.render(model);
+        const cells = document.querySelectorAll(".color-cell-edit");
+        const cell = cells[index];
+        if (cell)
+        {
+            cell.classList.add("removing");
+            setTimeout(() =>
+            {
+                color.options.splice(index, 1);
+                view.render(model);
+            }, 180);
+        }
+        else
+        {
+            color.options.splice(index, 1);
+            view.render(model);
+        }
+    },
+    setColorMax(raw)
+    {
+        let value = parseInt(raw, 10);
+        if (isNaN(value) || value < 50)
+        {
+            value = 50;
+        }
+        if (value > 100)
+        {
+            value = 100;
+        }
+        model.color.max = value;
+        const out = document.getElementById("color-max-value");
+        if (out)
+        {
+            out.textContent = value;
+        }
     },
     resetColors()
     {
@@ -605,7 +647,8 @@ const controller = {
                 timeEnd: model.time.end,
                 timeHour12: model.time.hour12,
                 timeRound: model.time.round,
-                colorOptions: model.color.options
+                colorOptions: model.color.options,
+                colorMax: model.color.max
             };
             localStorage.setItem("decisionmaker", JSON.stringify(data));
         }
@@ -666,6 +709,10 @@ const controller = {
             if (Array.isArray(data.colorOptions) && data.colorOptions.length >= 2)
             {
                 model.color.options = data.colorOptions;
+            }
+            if (typeof data.colorMax === "number")
+            {
+                model.color.max = Math.min(100, Math.max(50, data.colorMax));
             }
         }
         catch (e)
@@ -821,6 +868,10 @@ const controller = {
             else if (e.target.classList.contains("time-part"))
             {
                 controller.updateTimeField(e.target.dataset.target);
+            }
+            else if (e.target.id === "color-max")
+            {
+                controller.setColorMax(e.target.value);
             }
         });
 

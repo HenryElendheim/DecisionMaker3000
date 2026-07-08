@@ -259,7 +259,8 @@ const view = {
                     html += `<button class="color-remove" data-action="removeColor" data-index="${i}" aria-label="Remove color"${removeDisabled}>✕</button>`;
                     html += `</div>`;
                 }
-                html += `<button class="color-add" data-action="addColor" aria-label="Add color">+</button>`;
+                const atCap = color.options.length >= (color.max || 50);
+                html += `<button class="color-add" data-action="addColor" aria-label="Add color"${atCap ? " disabled title=\"Maximum reached\"" : ""}>+</button>`;
                 html += `</div>`;
                 html += `<div class="color-editor-actions">`;
                 html += `<button class="btn-secondary" data-action="resetColors">Reset to default</button>`;
@@ -320,6 +321,12 @@ const view = {
             const cls12 = model.time.hour12 ? "theme-btn active" : "theme-btn";
             html += `<button class="${cls24}" data-action="setTimeFormat" data-format="24">24-hour</button>`;
             html += `<button class="${cls12}" data-action="setTimeFormat" data-format="12">12-hour (AM / PM)</button>`;
+            html += `</div>`;
+            html += `<h2 class="settings-label">Pick a Color</h2>`;
+            const colorMax = model.color.max || 50;
+            html += `<div class="slider-setting">`;
+            html += `<div class="slider-row"><span>Maximum colors</span><span class="slider-value" id="color-max-value">${colorMax}</span></div>`;
+            html += `<input type="range" id="color-max" min="50" max="100" step="5" value="${colorMax}">`;
             html += `</div>`;
             return html;
         }
