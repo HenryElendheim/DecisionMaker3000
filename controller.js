@@ -215,7 +215,7 @@ const controller = {
             }
         }, 80);
 
-        const minSpin = dice.count === 1 ? 1800 : 500;
+        const minSpin = dice.spinTime;
         const stagger = Math.min(220, Math.floor(2000 / dice.count));
         for (let d = 0; d < dice.count; d++)
         {
@@ -271,6 +271,24 @@ const controller = {
         if (out)
         {
             out.textContent = value;
+        }
+    },
+    setDiceSpin(raw)
+    {
+        let seconds = parseFloat(raw);
+        if (isNaN(seconds) || seconds < 1)
+        {
+            seconds = 1;
+        }
+        if (seconds > 10)
+        {
+            seconds = 10;
+        }
+        model.dice.spinTime = Math.round(seconds * 1000);
+        const out = document.getElementById("dice-spin-value");
+        if (out)
+        {
+            out.textContent = seconds + "s";
         }
     },
     ask()
@@ -648,6 +666,7 @@ const controller = {
                 coinMode: model.coin.mode,
                 diceCount: model.dice.count,
                 diceMax: model.dice.max,
+                diceSpinTime: model.dice.spinTime,
                 numberMin: model.number.min,
                 numberMax: model.number.max,
                 wheelOptions: model.wheel.options,
@@ -685,6 +704,10 @@ const controller = {
             if (typeof data.diceMax === "number")
             {
                 model.dice.max = Math.min(50, Math.max(10, data.diceMax));
+            }
+            if (typeof data.diceSpinTime === "number")
+            {
+                model.dice.spinTime = Math.min(10000, Math.max(1000, data.diceSpinTime));
             }
             if (typeof data.diceCount === "number")
             {
@@ -883,6 +906,10 @@ const controller = {
             else if (e.target.id === "dice-max")
             {
                 controller.setDiceMax(e.target.value);
+            }
+            else if (e.target.id === "dice-spin")
+            {
+                controller.setDiceSpin(e.target.value);
             }
         });
 

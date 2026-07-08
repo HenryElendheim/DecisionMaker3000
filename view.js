@@ -320,6 +320,11 @@ const view = {
             html += `<div class="slider-row"><span>Maximum dice</span><span class="slider-value" id="dice-max-value">${diceMax}</span></div>`;
             html += `<input type="range" id="dice-max" min="10" max="50" step="5" value="${diceMax}">`;
             html += `</div>`;
+            const spinSec = (model.dice.spinTime || 1800) / 1000;
+            html += `<div class="slider-setting">`;
+            html += `<div class="slider-row"><span>Spin time</span><span class="slider-value" id="dice-spin-value">${spinSec}s</span></div>`;
+            html += `<input type="range" id="dice-spin" min="1" max="10" step="0.1" value="${spinSec}">`;
+            html += `</div>`;
             html += `<h2 class="settings-label">Pick a Time</h2>`;
             html += `<div class="theme-options">`;
             const cls24 = !model.time.hour12 ? "theme-btn active" : "theme-btn";

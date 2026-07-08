@@ -965,6 +965,10 @@ h1 {
     max-width: var(--max-width);
 }
 
+.slider-setting + .slider-setting {
+    margin-top: 1.25rem;
+}
+
 .slider-row {
     display: flex;
     justify-content: space-between;
