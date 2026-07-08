@@ -212,11 +212,19 @@ const view = {
             html += `<div class="game">`;
             html += `<h1>Pick a Time</h1>`;
             html += `<div class="time-range">`;
-            html += `<label>From <input type="time" id="time-start" value="${time.start}"></label>`;
-            html += `<label>To <input type="time" id="time-end" value="${time.end}"></label>`;
+            if (time.hour12)
+            {
+                html += view.timeField12("start", time.start, "From");
+                html += view.timeField12("end", time.end, "To");
+            }
+            else
+            {
+                html += `<label>From <input type="time" id="time-start" value="${time.start}"></label>`;
+                html += `<label>To <input type="time" id="time-end" value="${time.end}"></label>`;
+            }
             html += `</div>`;
             html += `<div class="time-display" id="time-result">`;
-            html += (time.result !== null ? time.result : "--:--");
+            html += (time.result !== null ? time.result : (time.hour12 ? "--:-- --" : "--:--"));
             html += `</div>`;
             if (time.picking)
             {
@@ -226,6 +234,7 @@ const view = {
             {
                 html += `<button class="btn" data-action="pickTime">${time.result !== null ? "Pick again" : "Pick a time"}</button>`;
             }
+            html += `<label class="ampm-check"><input type="checkbox" id="time-ampm"${time.hour12 ? " checked" : ""}> AM / PM</label>`;
             html += `</div>`;
             return html;
         },
@@ -252,8 +261,10 @@ const view = {
             html += `</div>`;
             html += `<h2 class="settings-label">Pick a Time</h2>`;
             html += `<div class="theme-options">`;
-            const hour12On = model.time.hour12;
-            html += `<button class="theme-btn${hour12On ? " active" : ""}" data-action="toggleTimeFormat" aria-pressed="${hour12On}">12-hour (AM / PM)</button>`;
+            const cls24 = !model.time.hour12 ? "theme-btn active" : "theme-btn";
+            const cls12 = model.time.hour12 ? "theme-btn active" : "theme-btn";
+            html += `<button class="${cls24}" data-action="setTimeFormat" data-format="24">24-hour</button>`;
+            html += `<button class="${cls12}" data-action="setTimeFormat" data-format="12">12-hour (AM / PM)</button>`;
             html += `</div>`;
             return html;
         }
@@ -398,5 +409,34 @@ const view = {
         {
             el.textContent = value;
         }
+    },
+    timeField12(target, canonical, label)
+    {
+        const parts = canonical.split(":");
+        const h24 = parseInt(parts[0], 10);
+        const minute = parts[1] || "00";
+        const period = h24 < 12 ? "AM" : "PM";
+        let hour = h24 % 12;
+        if (hour === 0)
+        {
+            hour = 12;
+        }
+        let html = "";
+        html += `<div class="time-field">`;
+        html += `<span class="time-field-label">${label}</span>`;
+        html += `<div class="time-field-inputs">`;
+        html += `<input type="number" class="time-part" data-target="${target}" id="time-${target}-hour" min="1" max="12" value="${hour}">`;
+        html += `<span class="time-colon">:</span>`;
+        html += `<input type="number" class="time-part" data-target="${target}" id="time-${target}-min" min="0" max="59" value="${minute}">`;
+        html += `<div class="ampm-picker">`;
+        for (const p of ["AM", "PM"])
+        {
+            const active = p === period ? " active" : "";
+            html += `<button class="ampm-btn${active}" data-action="setPeriod" data-target="${target}" data-period="${p}">${p}</button>`;
+        }
+        html += `</div>`;
+        html += `</div>`;
+        html += `</div>`;
+        return html;
     }
 };

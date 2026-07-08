@@ -52,9 +52,83 @@ const controller = {
         coin.frame = null;
         view.render(model);
     },
+    setTimeFormat(format)
+    {
+        model.time.hour12 = (format === "12");
+        view.render(model);
+    },
     toggleTimeFormat()
     {
         model.time.hour12 = !model.time.hour12;
+        view.render(model);
+    },
+    readTimeField(target)
+    {
+        const time = model.time;
+        const canonical = target === "start" ? time.start : time.end;
+        const hourEl = document.getElementById("time-" + target + "-hour");
+        const minEl = document.getElementById("time-" + target + "-min");
+        if (!hourEl || !minEl)
+        {
+            return canonical;
+        }
+        let hour = parseInt(hourEl.value, 10);
+        if (isNaN(hour) || hour < 1)
+        {
+            hour = 12;
+        }
+        if (hour > 12)
+        {
+            hour = 12;
+        }
+        let minute = parseInt(minEl.value, 10);
+        if (isNaN(minute) || minute < 0)
+        {
+            minute = 0;
+        }
+        if (minute > 59)
+        {
+            minute = 59;
+        }
+        const period = parseInt(canonical.split(":")[0], 10) < 12 ? "AM" : "PM";
+        let h24 = hour % 12;
+        if (period === "PM")
+        {
+            h24 += 12;
+        }
+        return String(h24).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
+    },
+    updateTimeField(target)
+    {
+        const value = controller.readTimeField(target);
+        if (target === "start")
+        {
+            model.time.start = value;
+        }
+        else
+        {
+            model.time.end = value;
+        }
+    },
+    setPeriod(target, period)
+    {
+        controller.updateTimeField(target);
+        const current = target === "start" ? model.time.start : model.time.end;
+        const parts = current.split(":");
+        let h24 = parseInt(parts[0], 10) % 12;
+        if (period === "PM")
+        {
+            h24 += 12;
+        }
+        const value = String(h24).padStart(2, "0") + ":" + parts[1];
+        if (target === "start")
+        {
+            model.time.start = value;
+        }
+        else
+        {
+            model.time.end = value;
+        }
         view.render(model);
     },
     flip()
@@ -311,15 +385,23 @@ const controller = {
             return;
         }
 
-        const startInput = document.getElementById("time-start");
-        const endInput = document.getElementById("time-end");
-        if (startInput && startInput.value)
+        if (time.hour12)
         {
-            time.start = startInput.value;
+            controller.updateTimeField("start");
+            controller.updateTimeField("end");
         }
-        if (endInput && endInput.value)
+        else
         {
-            time.end = endInput.value;
+            const startInput = document.getElementById("time-start");
+            const endInput = document.getElementById("time-end");
+            if (startInput && startInput.value)
+            {
+                time.start = startInput.value;
+            }
+            if (endInput && endInput.value)
+            {
+                time.end = endInput.value;
+            }
         }
 
         const toMinutes = (t) =>
@@ -499,9 +581,13 @@ const controller = {
             {
                 controller.toggleCoinMode();
             }
-            else if (action && action.dataset.action === "toggleTimeFormat")
+            else if (action && action.dataset.action === "setTimeFormat")
             {
-                controller.toggleTimeFormat();
+                controller.setTimeFormat(action.dataset.format);
+            }
+            else if (action && action.dataset.action === "setPeriod")
+            {
+                controller.setPeriod(action.dataset.target, action.dataset.period);
             }
             else if (action && action.dataset.action === "roll")
             {
@@ -558,6 +644,10 @@ const controller = {
             {
                 controller.setDiceCount(e.target.value);
             }
+            else if (e.target.classList.contains("time-part"))
+            {
+                controller.updateTimeField(e.target.dataset.target);
+            }
         });
 
         model.app.addEventListener("change", (e) =>
@@ -565,6 +655,10 @@ const controller = {
             if (e.target.id === "dice-count")
             {
                 e.target.value = model.dice.count;
+            }
+            else if (e.target.id === "time-ampm")
+            {
+                controller.toggleTimeFormat();
             }
         });
         view.render(model);
