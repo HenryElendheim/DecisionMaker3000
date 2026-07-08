@@ -50,7 +50,7 @@ const view = {
                 html += `<button class="btn" data-action="flip">Flip</button>`;
             }
             const headsTailsOn = coin.mode === "headstails";
-            html += `<button class="btn-secondary${headsTailsOn ? " toggle-on" : ""}" data-action="toggleCoinMode"${coin.flipping ? " disabled" : ""} aria-pressed="${headsTailsOn}">Heads / Tails</button>`;
+            html += `<label class="check-row"><input type="checkbox" id="coin-mode"${headsTailsOn ? " checked" : ""}${coin.flipping ? " disabled" : ""}> Heads / Tails</label>`;
             html += `</div>`;
             html += `</div>`;
             return html;
@@ -238,8 +238,8 @@ const view = {
             {
                 html += `<button class="btn" data-action="pickTime">${time.result !== null ? "Pick again" : "Pick a time"}</button>`;
             }
-            html += `<label class="ampm-check"><input type="checkbox" id="time-ampm"${time.hour12 ? " checked" : ""}> AM / PM</label>`;
-            html += `<label class="ampm-check"><input type="checkbox" id="time-round"${time.round ? " checked" : ""}> Round to 00 / 15 / 30 / 45</label>`;
+            html += `<label class="check-row"><input type="checkbox" id="time-ampm"${time.hour12 ? " checked" : ""}> AM / PM</label>`;
+            html += `<label class="check-row"><input type="checkbox" id="time-round"${time.round ? " checked" : ""}> Round to 00 / 15 / 30 / 45</label>`;
             html += `</div>`;
             return html;
         },

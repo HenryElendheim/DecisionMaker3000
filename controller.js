@@ -723,10 +723,6 @@ const controller = {
             {
                 controller.setCoinMode(action.dataset.mode);
             }
-            else if (action && action.dataset.action === "toggleCoinMode")
-            {
-                controller.toggleCoinMode();
-            }
             else if (action && action.dataset.action === "setTimeFormat")
             {
                 controller.setTimeFormat(action.dataset.format);
@@ -857,6 +853,10 @@ const controller = {
             else if (e.target.id === "time-round")
             {
                 controller.toggleTimeRound();
+            }
+            else if (e.target.id === "coin-mode")
+            {
+                controller.toggleCoinMode();
             }
         });
         view.render(model);
