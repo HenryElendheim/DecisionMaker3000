@@ -216,7 +216,7 @@ const controller = {
         }, 80);
 
         const minSpin = 500;
-        const stagger = 220;
+        const stagger = Math.min(220, Math.floor(2000 / dice.count));
         for (let d = 0; d < dice.count; d++)
         {
             setTimeout(() =>
@@ -240,14 +240,38 @@ const controller = {
         {
             count = 1;
         }
-        if (count > 10)
+        if (count > model.dice.max)
         {
-            count = 10;
+            count = model.dice.max;
         }
         model.dice.count = count;
         model.dice.values = [];
         model.dice.settled = [];
         view.setDiceArea(model);
+    },
+    setDiceMax(raw)
+    {
+        let value = parseInt(raw, 10);
+        if (isNaN(value) || value < 10)
+        {
+            value = 10;
+        }
+        if (value > 50)
+        {
+            value = 50;
+        }
+        model.dice.max = value;
+        if (model.dice.count > value)
+        {
+            model.dice.count = value;
+            model.dice.values = [];
+            model.dice.settled = [];
+        }
+        const out = document.getElementById("dice-max-value");
+        if (out)
+        {
+            out.textContent = value;
+        }
     },
     ask()
     {
@@ -622,6 +646,7 @@ const controller = {
                 theme: model.theme,
                 coinMode: model.coin.mode,
                 diceCount: model.dice.count,
+                diceMax: model.dice.max,
                 numberMin: model.number.min,
                 numberMax: model.number.max,
                 wheelOptions: model.wheel.options,
@@ -656,9 +681,13 @@ const controller = {
             {
                 model.coin.mode = data.coinMode;
             }
+            if (typeof data.diceMax === "number")
+            {
+                model.dice.max = Math.min(50, Math.max(10, data.diceMax));
+            }
             if (typeof data.diceCount === "number")
             {
-                model.dice.count = data.diceCount;
+                model.dice.count = Math.min(model.dice.max, Math.max(1, data.diceCount));
             }
             if (typeof data.numberMin === "number")
             {
@@ -849,6 +878,10 @@ const controller = {
             else if (e.target.id === "color-max")
             {
                 controller.setColorMax(e.target.value);
+            }
+            else if (e.target.id === "dice-max")
+            {
+                controller.setDiceMax(e.target.value);
             }
         });
 

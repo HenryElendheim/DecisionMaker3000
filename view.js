@@ -63,7 +63,7 @@ const view = {
             html += `<div class="game">`;
             html += `<h1>Dice Roll</h1>`;
             html += `<div class="dice-count">`;
-            html += `<label>Number of dice <input type="number" id="dice-count" min="1" max="10" value="${dice.count}"${dice.rolling ? " disabled" : ""}></label>`;
+            html += `<label>Number of dice <input type="number" id="dice-count" min="1" max="${dice.max}" value="${dice.count}"${dice.rolling ? " disabled" : ""}></label>`;
             html += `</div>`;
             html += `<div class="dice" id="dice">`;
             html += view.diceMarkup(model);
@@ -318,6 +318,12 @@ const view = {
                 const cls = mode.id === model.coin.mode ? "theme-btn active" : "theme-btn";
                 html += `<button class="${cls}" data-action="setCoinMode" data-mode="${mode.id}">${mode.name}</button>`;
             }
+            html += `</div>`;
+            html += `<h2 class="settings-label">Dice Roll</h2>`;
+            const diceMax = model.dice.max || 10;
+            html += `<div class="slider-setting">`;
+            html += `<div class="slider-row"><span>Maximum dice</span><span class="slider-value" id="dice-max-value">${diceMax}</span></div>`;
+            html += `<input type="range" id="dice-max" min="10" max="50" step="5" value="${diceMax}">`;
             html += `</div>`;
             html += `<h2 class="settings-label">Pick a Time</h2>`;
             html += `<div class="theme-options">`;

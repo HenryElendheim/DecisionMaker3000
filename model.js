@@ -45,7 +45,8 @@ const model = {
         values: [],
         settled: [],
         rolling: false,
-        sides: 6
+        sides: 6,
+        max: 10
     },
     magic8: {
         answer: null,
