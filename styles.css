@@ -241,40 +241,81 @@ h1 {
     transform: none;
 }
 
-.settings-label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--muted);
-    margin: 1.5rem 0 0.75rem;
-}
-
-.theme-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    max-width: var(--max-width);
-}
-
-.theme-btn {
-    font: inherit;
-    font-size: 1.05rem;
-    text-align: left;
+.settings-card {
     background: var(--surface);
-    color: var(--text);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1rem 1.15rem;
+    padding: 1.15rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.settings-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+}
+
+.settings-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--glow);
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.settings-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.setting-label {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin: 0 0 0.55rem;
+}
+
+.setting-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0.55rem 0 0;
+}
+
+.segmented {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.segmented-btn {
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: border-color 0.12s ease, background 0.12s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
-.theme-btn:hover {
-    border-color: var(--accent);
-    background: var(--surface-hover);
+.segmented-btn:hover:not(.active) {
+    color: var(--text);
 }
 
-.theme-btn.active {
-    border: 2px solid var(--accent);
+.segmented-btn.active {
+    background: var(--accent);
+    color: #ffffff;
 }
 
 .placeholder {

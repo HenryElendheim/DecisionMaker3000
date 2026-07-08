@@ -299,46 +299,38 @@ const view = {
             let html = "";
             html += `<button class="back" data-action="closeSettings">‹ Back</button>`;
             html += `<h1>Settings</h1>`;
-            html += `<h2 class="settings-label">Theme</h2>`;
-            html += `<div class="theme-options">`;
-            for (const theme of model.themes)
-            {
-                const cls = theme.id === model.theme ? "theme-btn active" : "theme-btn";
-                html += `<button class="${cls}" data-action="setTheme" data-theme="${theme.id}">${theme.name}</button>`;
-            }
-            html += `</div>`;
-            html += `<h2 class="settings-label">Coin</h2>`;
-            html += `<div class="theme-options">`;
-            for (const mode of model.coin.modes)
-            {
-                const cls = mode.id === model.coin.mode ? "theme-btn active" : "theme-btn";
-                html += `<button class="${cls}" data-action="setCoinMode" data-mode="${mode.id}">${mode.name}</button>`;
-            }
-            html += `</div>`;
-            html += `<h2 class="settings-label">Dice Roll</h2>`;
+            html += `<section class="settings-card">`;
+            html += view.settingsCardHeader("theme", "Appearance");
+            html += `<p class="setting-label">Theme</p>`;
+            html += view.settingsSegmented(model.themes, model.theme, "setTheme", "theme");
+            html += `</section>`;
+
+            html += `<section class="settings-card">`;
+            html += view.settingsCardHeader("coin", "Coin Flip");
+            html += `<p class="setting-label">Coin sides</p>`;
+            html += view.settingsSegmented(model.coin.modes, model.coin.mode, "setCoinMode", "mode");
+            html += `</section>`;
+
             const diceMax = model.dice.max || 10;
-            html += `<div class="slider-setting">`;
-            html += `<div class="slider-row"><span>Maximum dice</span><span class="slider-value" id="dice-max-value">${diceMax}</span></div>`;
-            html += `<input type="range" id="dice-max" min="10" max="50" step="5" value="${diceMax}">`;
-            html += `</div>`;
             const spinSec = (model.dice.spinTime || 1800) / 1000;
-            html += `<div class="slider-setting">`;
-            html += `<div class="slider-row"><span>Spin time</span><span class="slider-value" id="dice-spin-value">${spinSec}s</span></div>`;
-            html += `<input type="range" id="dice-spin" min="1" max="10" step="0.1" value="${spinSec}">`;
-            html += `</div>`;
-            html += `<h2 class="settings-label">Pick a Time</h2>`;
-            html += `<div class="theme-options">`;
-            const cls24 = !model.time.hour12 ? "theme-btn active" : "theme-btn";
-            const cls12 = model.time.hour12 ? "theme-btn active" : "theme-btn";
-            html += `<button class="${cls24}" data-action="setTimeFormat" data-format="24">24-hour</button>`;
-            html += `<button class="${cls12}" data-action="setTimeFormat" data-format="12">12-hour (AM / PM)</button>`;
-            html += `</div>`;
-            html += `<h2 class="settings-label">Pick a Color</h2>`;
+            html += `<section class="settings-card">`;
+            html += view.settingsCardHeader("dice", "Dice Roll");
+            html += view.settingsSlider("dice-max", "Maximum dice", diceMax, 10, 50, 5, diceMax, "How many dice you can roll at once.");
+            html += view.settingsSlider("dice-spin", "Spin time", spinSec + "s", 1, 10, 0.1, spinSec, "How long the dice spin before landing.");
+            html += `</section>`;
+
+            const timeFormat = model.time.hour12 ? "12" : "24";
+            html += `<section class="settings-card">`;
+            html += view.settingsCardHeader("time", "Pick a Time");
+            html += `<p class="setting-label">Clock format</p>`;
+            html += view.settingsSegmented([{ id: "24", name: "24-hour" }, { id: "12", name: "12-hour" }], timeFormat, "setTimeFormat", "format");
+            html += `</section>`;
+
             const colorMax = model.color.max || 50;
-            html += `<div class="slider-setting">`;
-            html += `<div class="slider-row"><span>Maximum colors</span><span class="slider-value" id="color-max-value">${colorMax}</span></div>`;
-            html += `<input type="range" id="color-max" min="50" max="100" step="5" value="${colorMax}">`;
-            html += `</div>`;
+            html += `<section class="settings-card">`;
+            html += view.settingsCardHeader("color", "Pick a Color");
+            html += view.settingsSlider("color-max", "Maximum colors", colorMax, 50, 100, 5, colorMax, "How many colors the picker can hold.");
+            html += `</section>`;
             return html;
         }
     },
@@ -498,6 +490,44 @@ const view = {
         }
         const yiq = (r * 299 + g * 587 + b * 114) / 1000;
         return yiq >= 150 ? "#000000" : "#ffffff";
+    },
+    settingsIcon(name)
+    {
+        const icons = {
+            theme: `<circle cx="12" cy="12" r="9"></circle><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor" stroke="none"></path>`,
+            coin: `<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3.4"></circle>`,
+            dice: `<rect x="3" y="3" width="18" height="18" rx="4"></rect><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"></circle>`,
+            time: `<circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path>`,
+            color: `<path d="M12 3c4 4.5 6 7.5 6 10a6 6 0 0 1-12 0c0-2.5 2-5.5 6-10z"></path>`
+        };
+        return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ""}</svg>`;
+    },
+    settingsCardHeader(icon, title)
+    {
+        return `<div class="settings-card-header"><span class="settings-icon">${view.settingsIcon(icon)}</span><span class="settings-card-title">${title}</span></div>`;
+    },
+    settingsSegmented(options, activeId, action, dataKey)
+    {
+        let html = `<div class="segmented">`;
+        for (const option of options)
+        {
+            const active = option.id === activeId ? " active" : "";
+            html += `<button class="segmented-btn${active}" data-action="${action}" data-${dataKey}="${option.id}">${view.escape(option.name)}</button>`;
+        }
+        html += `</div>`;
+        return html;
+    },
+    settingsSlider(id, label, valueText, min, max, step, value, desc)
+    {
+        let html = `<div class="slider-setting">`;
+        html += `<div class="slider-row"><span>${label}</span><span class="slider-value" id="${id}-value">${valueText}</span></div>`;
+        html += `<input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">`;
+        if (desc)
+        {
+            html += `<p class="setting-desc">${desc}</p>`;
+        }
+        html += `</div>`;
+        return html;
     },
     escape(str)
     {
