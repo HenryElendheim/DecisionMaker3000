@@ -36,7 +36,6 @@ const view = {
             html += `<div class="coin-face back">${view.coinFace(mode.sides[1].label)}</div>`;
             html += `</div>`;
             html += `</div>`;
-            html += `<div class="coin-result">${coin.result && !coin.flipping ? view.escape(coin.result.label) : ""}</div>`;
             html += `<div class="coin-controls">`;
             if (coin.flipping)
             {
