@@ -215,7 +215,7 @@ const controller = {
             }
         }, 80);
 
-        const minSpin = 500;
+        const minSpin = dice.count === 1 ? 1800 : 500;
         const stagger = Math.min(220, Math.floor(2000 / dice.count));
         for (let d = 0; d < dice.count; d++)
         {
