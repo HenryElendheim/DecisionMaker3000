@@ -5,7 +5,7 @@ const controller = {
         if (viewName === "coinflip")
         {
             model.coin.result = null;
-            model.coin.frame = null;
+            model.coin.rotation = 0;
         }
         else if (viewName === "dice")
         {
@@ -58,7 +58,6 @@ const controller = {
     {
         model.coin.mode = modeId;
         model.coin.result = null;
-        model.coin.frame = null;
         view.render(model);
     },
     toggleCoinMode()
@@ -66,7 +65,6 @@ const controller = {
         const coin = model.coin;
         coin.mode = (coin.mode === "headstails") ? "yesno" : "headstails";
         coin.result = null;
-        coin.frame = null;
         view.render(model);
     },
     setTimeFormat(format)
@@ -161,42 +159,28 @@ const controller = {
             return;
         }
 
-        const f = coin.frames;
-        const sequence = [
-            f[3], f[2], f[1], f[0],
-            f[1], f[2], f[3],
-            f[2], f[1], f[0],
-            f[1], f[2], f[3],
-            f[2], f[1], f[0],
-            f[1], f[2], f[3],
-        ];
+        const mode = coin.modes.find((m) => m.id === coin.mode);
+        const chosen = Math.floor(Math.random() * mode.sides.length);
 
         coin.flipping = true;
         coin.result = null;
-        coin.frame = sequence[0];
         view.render(model);
 
-        let i = 0;
-        const timer = setInterval(() =>
+        const base = Math.ceil(coin.rotation / 360) * 360;
+        const target = base + 360 * 5 + (chosen === 1 ? 180 : 0);
+
+        setTimeout(() =>
         {
-            i++;
-            if (i < sequence.length)
-            {
-                coin.frame = sequence[i];
-                view.setCoinFrame(coin.frame);
-            }
-            else
-            {
-                clearInterval(timer);
-                const mode = coin.modes.find((m) => m.id === coin.mode);
-                const sides = mode.sides;
-                const index = Math.floor(Math.random() * sides.length);
-                coin.result = sides[index];
-                coin.frame = null;
-                coin.flipping = false;
-                view.render(model);
-            }
-        }, 50);
+            coin.rotation = target;
+            view.setCoinRotation(target);
+        }, 30);
+
+        setTimeout(() =>
+        {
+            coin.result = mode.sides[chosen];
+            coin.flipping = false;
+            view.render(model);
+        }, 2650);
     },
     roll()
     {
@@ -618,20 +602,6 @@ const controller = {
         color.index = null;
         view.render(model);
     },
-    preload()
-    {
-        const coin = model.coin;
-        let sources = coin.frames.slice();
-        for (const mode of coin.modes)
-        {
-            sources = sources.concat(mode.sides.map((side) => side.image));
-        }
-        for (const src of sources)
-        {
-            const img = new Image();
-            img.src = src;
-        }
-    },
     save()
     {
         try
@@ -722,7 +692,6 @@ const controller = {
     init()
     {
         controller.load();
-        controller.preload();
         document.documentElement.dataset.theme = model.theme;
         window.addEventListener("beforeunload", controller.save);
         document.addEventListener("visibilitychange", () =>

@@ -18,30 +18,24 @@ const model = {
     ],
     coin: {
         result: null,
-        frame: null,
         flipping: false,
-        frames: [
-            "images/flip1.png",
-            "images/flip2.png",
-            "images/flip3.png",
-            "images/flipEmpty.png"
-        ],
+        rotation: 0,
         mode: "yesno",
         modes: [
             {
                 id: "yesno",
                 name: "Yes / No",
                 sides: [
-                    { id: "yes", label: "Yes", image: "images/flipYes.png" },
-                    { id: "no", label: "No", image: "images/flipNo.png" }
+                    { id: "yes", label: "Yes" },
+                    { id: "no", label: "No" }
                 ]
             },
             {
                 id: "headstails",
                 name: "Heads / Tails",
                 sides: [
-                    { id: "heads", label: "Heads", image: "images/flipHeads.png" },
-                    { id: "tails", label: "Tails", image: "images/flipTails.png" }
+                    { id: "heads", label: "Heads" },
+                    { id: "tails", label: "Tails" }
                 ]
             }
         ]

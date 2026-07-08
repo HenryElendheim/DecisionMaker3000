@@ -156,23 +156,83 @@ h1 {
 }
 
 .coin {
-    width: 180px;
-    height: 180px;
-    margin: 2rem auto;
+    width: 170px;
+    height: 170px;
+    margin: 2rem auto 0.5rem;
+    perspective: 800px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.coin img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+.coin-3d {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 2.6s cubic-bezier(0.2, 0.72, 0.2, 1);
 }
 
-.coin-placeholder {
-    font-size: 4rem;
-    color: var(--muted);
+.coin-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.coin-face.back {
+    transform: rotateX(180deg);
+}
+
+.coin-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+
+.coin-text {
+    fill: #6b4e00;
+    font-size: 26px;
+    font-weight: 800;
+    font-family: inherit;
+}
+
+.coin.landed {
+    animation: coin-land 0.55s cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+
+@keyframes coin-land {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(1.14);
+    }
+    60% {
+        transform: scale(0.97);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.coin-result {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+    min-height: 1.5em;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.coin-result:not(:empty) {
+    animation: value-pop 0.5s cubic-bezier(0.22, 1.3, 0.36, 1) both;
 }
 
 .btn {
@@ -956,4 +1016,101 @@ input[type="range"] {
     width: 100%;
     accent-color: var(--accent);
     cursor: pointer;
+}
+
+.number-display.landed,
+.time-display.landed {
+    animation: value-pop 0.55s cubic-bezier(0.22, 1.3, 0.36, 1) both;
+}
+
+@keyframes value-pop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+        filter: drop-shadow(0 0 0 rgba(177, 77, 224, 0));
+    }
+    55% {
+        transform: scale(1.25);
+        opacity: 1;
+        filter: drop-shadow(0 0 16px var(--accent));
+    }
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(177, 77, 224, 0));
+    }
+}
+
+.die.landed {
+    animation: die-land 0.5s cubic-bezier(0.22, 1.3, 0.36, 1) both;
+}
+
+@keyframes die-land {
+    0% {
+        transform: scale(0.7) rotate(-10deg);
+    }
+    55% {
+        transform: scale(1.2) rotate(4deg);
+        box-shadow: 0 0 20px 3px rgba(255, 255, 255, 0.4);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.wheel.landed {
+    animation: wheel-glow 0.75s ease-out;
+}
+
+@keyframes wheel-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+    30% {
+        box-shadow: 0 0 36px 8px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.wheel-result {
+    animation: value-pop 0.5s cubic-bezier(0.22, 1.3, 0.36, 1) both;
+}
+
+.ball.landed {
+    animation: ball-land 0.6s cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+
+@keyframes ball-land {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.12);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    72% {
+        transform: scale(1.04);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.ball.landed .ball-window {
+    animation: fade-scale-in 0.5s ease both;
+}
+
+@keyframes fade-scale-in {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

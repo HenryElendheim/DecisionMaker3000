@@ -19,22 +19,24 @@ const view = {
         coinflip(model)
         {
             const coin = model.coin;
+            const mode = coin.modes.find((m) => m.id === coin.mode);
             let html = "";
             html += `<button class="back" data-nav="home">‹ Back</button>`;
             html += `<div class="game">`;
             html += `<h1>Coin Flip</h1>`;
-            html += `<div class="coin">`;
-            const src = coin.frame ?? (coin.result ? coin.result.image : null);
-            if (src)
-            {
-                const alt = (coin.result && !coin.frame) ? coin.result.label : "";
-                html += `<img id="coin-img" src="${src}" alt="${alt}">`;
-            }
-            else
-            {
-                html += `<img id="coin-img" src="images/flipEmpty.png" alt="?">`;
-            }
+            html += `<svg width="0" height="0" class="coin-defs" aria-hidden="true"><defs>`;
+            html += `<radialGradient id="coinGold" cx="38%" cy="34%" r="75%">`;
+            html += `<stop offset="0%" stop-color="#ffe9a8"></stop>`;
+            html += `<stop offset="55%" stop-color="#f5c542"></stop>`;
+            html += `<stop offset="100%" stop-color="#d99a1c"></stop>`;
+            html += `</radialGradient></defs></svg>`;
+            html += `<div class="coin${!coin.flipping && coin.result ? " landed" : ""}">`;
+            html += `<div class="coin-3d" id="coin-3d" style="transform: rotateX(${coin.rotation}deg)">`;
+            html += `<div class="coin-face front">${view.coinFace(mode.sides[0].label)}</div>`;
+            html += `<div class="coin-face back">${view.coinFace(mode.sides[1].label)}</div>`;
             html += `</div>`;
+            html += `</div>`;
+            html += `<div class="coin-result">${coin.result && !coin.flipping ? view.escape(coin.result.label) : ""}</div>`;
             html += `<div class="coin-controls">`;
             if (coin.flipping)
             {
@@ -85,7 +87,7 @@ const view = {
             html += `<button class="back" data-nav="home">‹ Back</button>`;
             html += `<div class="game">`;
             html += `<h1>Magic 8-Ball</h1>`;
-            html += `<div class="ball${magic8.shaking ? " shaking" : ""}">`;
+            html += `<div class="ball${magic8.shaking ? " shaking" : ""}${!magic8.shaking && magic8.answer ? " landed" : ""}">`;
             html += `<div class="ball-window">`;
             if (magic8.shaking)
             {
@@ -152,7 +154,8 @@ const view = {
                 const seg = 360 / options.length;
                 html += `<div class="wheel-wrap">`;
                 html += `<div class="wheel-pointer"></div>`;
-                html += `<div class="wheel" id="wheel" style="transform: rotate(${wheel.rotation}deg); background: ${view.wheelGradient(options)}">`;
+                const wheelLanded = !wheel.spinning && wheel.result ? " landed" : "";
+                html += `<div class="wheel${wheelLanded}" id="wheel" style="transform: rotate(${wheel.rotation}deg); background: ${view.wheelGradient(options)}">`;
                 for (let i = 0; i < options.length; i++)
                 {
                     const angle = i * seg + seg / 2;
@@ -190,7 +193,8 @@ const view = {
             html += `<label>Min <input type="number" id="num-min" value="${number.min}"></label>`;
             html += `<label>Max <input type="number" id="num-max" value="${number.max}"></label>`;
             html += `</div>`;
-            html += `<div class="number-display" id="number-display">`;
+            const numLanded = number.value !== null && !number.picking ? " landed" : "";
+            html += `<div class="number-display${numLanded}" id="number-display">`;
             html += (number.value !== null ? number.value : "?");
             html += `</div>`;
             if (number.picking)
@@ -223,7 +227,8 @@ const view = {
                 html += `<label>To <input type="time" id="time-end" value="${time.end}"></label>`;
             }
             html += `</div>`;
-            html += `<div class="time-display" id="time-result">`;
+            const timeLanded = time.result !== null && !time.picking ? " landed" : "";
+            html += `<div class="time-display${timeLanded}" id="time-result">`;
             html += (time.result !== null ? time.result : (time.hour12 ? "--:-- --" : "--:--"));
             html += `</div>`;
             if (time.picking)
@@ -367,12 +372,22 @@ const view = {
         }
         model.app.innerHTML = html;
     },
-    setCoinFrame(src)
+    coinFace(label)
     {
-        const img = document.getElementById("coin-img");
-        if (img)
+        let html = "";
+        html += `<svg viewBox="0 0 120 120" class="coin-svg" aria-hidden="true">`;
+        html += `<circle cx="60" cy="60" r="57" fill="url(#coinGold)" stroke="#b97e12" stroke-width="3"></circle>`;
+        html += `<circle cx="60" cy="60" r="47" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="2"></circle>`;
+        html += `<text x="60" y="63" text-anchor="middle" dominant-baseline="middle" class="coin-text">${view.escape(label)}</text>`;
+        html += `</svg>`;
+        return html;
+    },
+    setCoinRotation(deg)
+    {
+        const coin = document.getElementById("coin-3d");
+        if (coin)
         {
-            img.src = src;
+            coin.style.transform = `rotateX(${deg}deg)`;
         }
     },
     dieFace(value)
@@ -407,7 +422,9 @@ const view = {
         for (let i = 0; i < dice.count; i++)
         {
             const value = (dice.values && dice.values[i]) ? dice.values[i] : null;
-            html += `<div class="die${dice.rolling ? " rolling" : ""}" id="die-${i}">${view.dieFace(value)}</div>`;
+            const landed = !dice.rolling && value;
+            const delay = landed ? ` style="animation-delay:${(i * 0.06).toFixed(2)}s"` : "";
+            html += `<div class="die${dice.rolling ? " rolling" : ""}${landed ? " landed" : ""}" id="die-${i}"${delay}>${view.dieFace(value)}</div>`;
         }
         return html;
     },
