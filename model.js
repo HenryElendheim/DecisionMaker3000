@@ -78,6 +78,7 @@ const model = {
         rotation: 0,
         spinning: false,
         result: null,
+        resultColor: null,
         editing: false,
         options: [
             { label: "Yes", color: "#8e2de2" },

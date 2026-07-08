@@ -326,6 +326,7 @@ const controller = {
         setTimeout(() =>
         {
             wheel.result = options[i].label;
+            wheel.resultColor = options[i].color;
             wheel.spinning = false;
             view.render(model);
         }, 3700);

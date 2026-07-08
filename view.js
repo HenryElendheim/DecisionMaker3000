@@ -87,20 +87,18 @@ const view = {
             html += `<div class="game">`;
             html += `<h1>Magic 8-Ball</h1>`;
             html += `<div class="ball${magic8.shaking ? " shaking" : ""}${!magic8.shaking && magic8.answer ? " landed" : ""}">`;
-            html += `<div class="ball-window">`;
             if (magic8.shaking)
             {
-                html += `…`;
+                html += `<div class="ball-window">…</div>`;
             }
             else if (magic8.answer)
             {
-                html += magic8.answer;
+                html += `<div class="ball-window">${magic8.answer}</div>`;
             }
             else
             {
                 html += `<span class="ball-8">8</span>`;
             }
-            html += `</div>`;
             html += `</div>`;
             if (magic8.shaking)
             {
@@ -154,7 +152,8 @@ const view = {
                 html += `<div class="wheel-wrap">`;
                 html += `<div class="wheel-pointer"></div>`;
                 const wheelLanded = !wheel.spinning && wheel.result ? " landed" : "";
-                html += `<div class="wheel${wheelLanded}" id="wheel" style="transform: rotate(${wheel.rotation}deg); background: ${view.wheelGradient(options)}">`;
+                const glowVar = wheelLanded ? `; --glow-color: ${view.escape(wheel.resultColor || "#ffffff")}` : "";
+                html += `<div class="wheel${wheelLanded}" id="wheel" style="transform: rotate(${wheel.rotation}deg); background: ${view.wheelGradient(options)}${glowVar}">`;
                 for (let i = 0; i < options.length; i++)
                 {
                     const angle = i * seg + seg / 2;
