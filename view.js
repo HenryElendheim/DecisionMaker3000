@@ -87,11 +87,7 @@ const view = {
             html += `<div class="game">`;
             html += `<h1>Magic 8-Ball</h1>`;
             html += `<div class="ball${magic8.shaking ? " shaking" : ""}${!magic8.shaking && magic8.answer ? " landed" : ""}">`;
-            if (magic8.shaking)
-            {
-                html += `<div class="ball-window">…</div>`;
-            }
-            else if (magic8.answer)
+            if (!magic8.shaking && magic8.answer)
             {
                 html += `<div class="ball-window">${magic8.answer}</div>`;
             }
