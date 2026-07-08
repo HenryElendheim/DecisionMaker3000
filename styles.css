@@ -359,18 +359,20 @@ h1 {
 }
 
 .ball-window {
-    width: 130px;
-    height: 130px;
+    width: 128px;
+    height: 128px;
     border-radius: 50%;
-    background: #3a3a3a;
+    background: radial-gradient(circle at 50% 38%, #4763e4 0%, #24309a 55%, #141a63 100%);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 0.5rem;
-    font-size: 0.8rem;
-    line-height: 1.25;
+    padding: 0.6rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.3;
+    box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.55);
 }
 
 .ball-8 {
@@ -380,18 +382,39 @@ h1 {
 }
 
 .ball.shaking {
-    animation: ball-shake 0.4s ease-in-out infinite;
+    animation: ball-shake 1.05s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 @keyframes ball-shake {
-    0%, 100% {
-        transform: translate(0, 0) rotate(0deg);
+    0% {
+        transform: scale(1) rotate(0deg);
     }
-    25% {
-        transform: translate(-6px, 4px) rotate(-6deg);
+    9% {
+        transform: scale(0.93) translateY(8px) rotate(0deg);
     }
-    75% {
-        transform: translate(6px, -4px) rotate(6deg);
+    20% {
+        transform: scale(1.03) translate(-13px, -5px) rotate(-9deg);
+    }
+    31% {
+        transform: translate(14px, 4px) rotate(10deg);
+    }
+    42% {
+        transform: translate(-13px, -3px) rotate(-9deg);
+    }
+    54% {
+        transform: translate(11px, 3px) rotate(8deg);
+    }
+    66% {
+        transform: translate(-8px, -2px) rotate(-6deg);
+    }
+    78% {
+        transform: translate(5px, 1px) rotate(4deg);
+    }
+    89% {
+        transform: translate(-2px, 0) rotate(-2deg);
+    }
+    100% {
+        transform: scale(1) translate(0, 0) rotate(0deg);
     }
 }
 
@@ -1051,38 +1074,42 @@ input[type="range"] {
 }
 
 .ball.landed {
-    animation: ball-land 0.6s cubic-bezier(0.22, 1.2, 0.36, 1);
+    animation: ball-reveal 0.8s cubic-bezier(0.22, 1.2, 0.36, 1);
 }
 
-@keyframes ball-land {
+@keyframes ball-reveal {
     0% {
         transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(71, 99, 228, 0);
     }
-    25% {
-        transform: scale(1.12);
-    }
-    50% {
-        transform: scale(0.95);
-    }
-    72% {
-        transform: scale(1.04);
+    35% {
+        transform: scale(1.06);
+        box-shadow: 0 0 44px 10px rgba(71, 99, 228, 0.55);
     }
     100% {
         transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(71, 99, 228, 0);
     }
 }
 
 .ball.landed .ball-window {
-    animation: fade-scale-in 0.5s ease both;
+    animation: answer-rise 0.75s cubic-bezier(0.2, 1.25, 0.32, 1) both;
 }
 
-@keyframes fade-scale-in {
+@keyframes answer-rise {
     0% {
-        transform: scale(0.5);
+        transform: scale(0.2) translateY(26px);
         opacity: 0;
+        filter: blur(5px);
+    }
+    55% {
+        transform: scale(1.09) translateY(-5px);
+        opacity: 1;
+        filter: blur(0);
     }
     100% {
-        transform: scale(1);
+        transform: scale(1) translateY(0);
         opacity: 1;
+        filter: blur(0);
     }
 }

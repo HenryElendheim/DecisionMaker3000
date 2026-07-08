@@ -153,7 +153,8 @@ const view = {
                 for (let i = 0; i < options.length; i++)
                 {
                     const angle = i * seg + seg / 2;
-                    html += `<div class="wheel-label" style="transform: rotate(${angle}deg)"><span>${view.escape(options[i].label)}</span></div>`;
+                    const textColor = view.textColorFor(options[i].color);
+                    html += `<div class="wheel-label" style="transform: rotate(${angle}deg)"><span style="color: ${textColor}">${view.escape(options[i].label)}</span></div>`;
                 }
                 html += `</div>`;
                 html += `</div>`;
@@ -483,6 +484,20 @@ const view = {
             stops.push(`${options[i].color} ${i * seg}deg ${(i + 1) * seg}deg`);
         }
         return `conic-gradient(${stops.join(", ")})`;
+    },
+    textColorFor(hex)
+    {
+        const c = String(hex).replace("#", "");
+        const full = c.length === 3 ? c.split("").map((x) => x + x).join("") : c;
+        const r = parseInt(full.substr(0, 2), 16);
+        const g = parseInt(full.substr(2, 2), 16);
+        const b = parseInt(full.substr(4, 2), 16);
+        if (isNaN(r) || isNaN(g) || isNaN(b))
+        {
+            return "#ffffff";
+        }
+        const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+        return yiq >= 150 ? "#000000" : "#ffffff";
     },
     escape(str)
     {

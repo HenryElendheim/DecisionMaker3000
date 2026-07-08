@@ -308,7 +308,7 @@ const controller = {
             magic8.answer = answers[Math.floor(Math.random() * answers.length)];
             magic8.shaking = false;
             view.render(model);
-        }, 900);
+        }, 1050);
     },
     spin()
     {
