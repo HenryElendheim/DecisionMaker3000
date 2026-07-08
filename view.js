@@ -70,11 +70,11 @@ const view = {
             html += `</div>`;
             if (dice.rolling)
             {
-                html += `<button class="btn" data-action="roll" disabled>Rolling…</button>`;
+                html += `<button class="btn" id="roll-btn" data-action="roll" disabled>Rolling…</button>`;
             }
             else
             {
-                html += `<button class="btn" data-action="roll">Roll</button>`;
+                html += `<button class="btn" id="roll-btn" data-action="roll">Roll</button>`;
             }
             html += `</div>`;
             return html;
@@ -421,9 +421,10 @@ const view = {
         for (let i = 0; i < dice.count; i++)
         {
             const value = (dice.values && dice.values[i]) ? dice.values[i] : null;
-            const landed = !dice.rolling && value;
-            const delay = landed ? ` style="animation-delay:${(i * 0.06).toFixed(2)}s"` : "";
-            html += `<div class="die${dice.rolling ? " rolling" : ""}${landed ? " landed" : ""}" id="die-${i}"${delay}>${view.dieFace(value)}</div>`;
+            const settled = dice.settled && dice.settled[i];
+            const rolling = dice.rolling && !settled;
+            const landed = settled || (!dice.rolling && value);
+            html += `<div class="die${rolling ? " rolling" : ""}${landed ? " landed" : ""}" id="die-${i}">${view.dieFace(value)}</div>`;
         }
         return html;
     },
@@ -435,15 +436,36 @@ const view = {
             container.innerHTML = view.diceMarkup(model);
         }
     },
-    setDiceValues(values)
+    setDieFace(index, value)
     {
-        for (let i = 0; i < values.length; i++)
+        const die = document.getElementById("die-" + index);
+        if (die)
         {
-            const die = document.getElementById("die-" + i);
-            if (die)
-            {
-                die.innerHTML = view.dieFace(values[i]);
-            }
+            die.innerHTML = view.dieFace(value);
+        }
+    },
+    settleDie(index, value)
+    {
+        const die = document.getElementById("die-" + index);
+        if (die)
+        {
+            die.classList.remove("rolling");
+            die.classList.add("landed");
+            die.innerHTML = view.dieFace(value);
+        }
+    },
+    setRolling(rolling)
+    {
+        const btn = document.getElementById("roll-btn");
+        if (btn)
+        {
+            btn.disabled = rolling;
+            btn.textContent = rolling ? "Rolling…" : "Roll";
+        }
+        const count = document.getElementById("dice-count");
+        if (count)
+        {
+            count.disabled = rolling;
         }
     },
     wheelGradient(options)

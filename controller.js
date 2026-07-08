@@ -10,6 +10,7 @@ const controller = {
         else if (viewName === "dice")
         {
             model.dice.values = [];
+            model.dice.settled = [];
         }
         else if (viewName === "magic8")
         {
@@ -190,37 +191,47 @@ const controller = {
             return;
         }
 
+        const rollValue = () => Math.floor(Math.random() * dice.sides) + 1;
+
         dice.rolling = true;
         dice.values = [];
+        dice.settled = [];
         for (let d = 0; d < dice.count; d++)
         {
-            dice.values.push(Math.floor(Math.random() * dice.sides) + 1);
+            dice.values.push(rollValue());
+            dice.settled.push(false);
         }
         view.render(model);
 
-        let ticks = 0;
-        const timer = setInterval(() =>
+        const ticker = setInterval(() =>
         {
-            ticks++;
-            if (ticks < 10)
+            for (let d = 0; d < dice.count; d++)
             {
-                for (let d = 0; d < dice.count; d++)
+                if (!dice.settled[d])
                 {
-                    dice.values[d] = Math.floor(Math.random() * dice.sides) + 1;
+                    dice.values[d] = rollValue();
+                    view.setDieFace(d, dice.values[d]);
                 }
-                view.setDiceValues(dice.values);
             }
-            else
+        }, 80);
+
+        const minSpin = 500;
+        const stagger = 220;
+        for (let d = 0; d < dice.count; d++)
+        {
+            setTimeout(() =>
             {
-                clearInterval(timer);
-                for (let d = 0; d < dice.count; d++)
+                dice.values[d] = rollValue();
+                dice.settled[d] = true;
+                view.settleDie(d, dice.values[d]);
+                if (dice.settled.every((s) => s))
                 {
-                    dice.values[d] = Math.floor(Math.random() * dice.sides) + 1;
+                    clearInterval(ticker);
+                    dice.rolling = false;
+                    view.setRolling(false);
                 }
-                dice.rolling = false;
-                view.render(model);
-            }
-        }, 60);
+            }, minSpin + d * stagger);
+        }
     },
     setDiceCount(raw)
     {
@@ -235,6 +246,7 @@ const controller = {
         }
         model.dice.count = count;
         model.dice.values = [];
+        model.dice.settled = [];
         view.setDiceArea(model);
     },
     ask()

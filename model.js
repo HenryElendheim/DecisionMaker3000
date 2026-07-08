@@ -43,6 +43,7 @@ const model = {
     dice: {
         count: 1,
         values: [],
+        settled: [],
         rolling: false,
         sides: 6
     },
