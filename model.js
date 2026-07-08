@@ -108,6 +108,7 @@ const model = {
         start: "09:00",
         end: "17:00",
         result: null,
-        picking: false
+        picking: false,
+        hour12: false
     }
 };

@@ -52,6 +52,11 @@ const controller = {
         coin.frame = null;
         view.render(model);
     },
+    toggleTimeFormat()
+    {
+        model.time.hour12 = !model.time.hour12;
+        view.render(model);
+    },
     flip()
     {
         const coin = model.coin;
@@ -326,6 +331,16 @@ const controller = {
         {
             const h = Math.floor(mins / 60);
             const m = mins % 60;
+            if (time.hour12)
+            {
+                const period = h < 12 ? "AM" : "PM";
+                let hour = h % 12;
+                if (hour === 0)
+                {
+                    hour = 12;
+                }
+                return hour + ":" + String(m).padStart(2, "0") + " " + period;
+            }
             return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
         };
 
@@ -385,7 +400,8 @@ const controller = {
                 numberMax: model.number.max,
                 wheelOptions: model.wheel.options,
                 timeStart: model.time.start,
-                timeEnd: model.time.end
+                timeEnd: model.time.end,
+                timeHour12: model.time.hour12
             };
             localStorage.setItem("decisionmaker", JSON.stringify(data));
         }
@@ -435,6 +451,10 @@ const controller = {
             {
                 model.time.end = data.timeEnd;
             }
+            if (typeof data.timeHour12 === "boolean")
+            {
+                model.time.hour12 = data.timeHour12;
+            }
         }
         catch (e)
         {
@@ -478,6 +498,10 @@ const controller = {
             else if (action && action.dataset.action === "toggleCoinMode")
             {
                 controller.toggleCoinMode();
+            }
+            else if (action && action.dataset.action === "toggleTimeFormat")
+            {
+                controller.toggleTimeFormat();
             }
             else if (action && action.dataset.action === "roll")
             {

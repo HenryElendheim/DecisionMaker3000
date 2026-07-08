@@ -250,6 +250,11 @@ const view = {
                 html += `<button class="${cls}" data-action="setCoinMode" data-mode="${mode.id}">${mode.name}</button>`;
             }
             html += `</div>`;
+            html += `<h2 class="settings-label">Pick a Time</h2>`;
+            html += `<div class="theme-options">`;
+            const hour12On = model.time.hour12;
+            html += `<button class="theme-btn${hour12On ? " active" : ""}" data-action="toggleTimeFormat" aria-pressed="${hour12On}">12-hour (AM / PM)</button>`;
+            html += `</div>`;
             return html;
         }
     },
